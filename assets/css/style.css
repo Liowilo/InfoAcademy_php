@@ -1,0 +1,297 @@
+@import url(../css/clash-display.css);
+
+:root{
+    --c-dark: #212529;
+    --c-brand: #4e57d4;
+    --c-brand-light: #4e57d4;
+    --c-brand-rgb: 78, 87, 212;
+    --c-body: #727272;
+    --font-base: "ClashDisplay", sans-serif;
+    --box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.08);
+    --transition: all 0.5s ease;
+}
+
+body{
+    font-family: var(--font-base);
+    line-height: 1.7;
+    color: var(--c-body);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6{
+    font-weight: 600;
+    color: var(--c-dark);
+}
+
+a{
+    color: var(--c-brand);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover{
+    color: var(--c-brand-light);
+}
+
+img{
+    max-width: 100%;
+    height: auto;
+}
+
+.section-padding{
+    padding-top: 140px;
+    padding-bottom: 140px;
+}
+
+.logos-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinea los elementos al principio del contenedor */
+    width: 15%;
+}
+
+.logos-left img {
+    margin-right: 30px; /* Ajusta el espacio entre las imágenes si es necesario */
+}
+
+.theme-shadow {
+    box-shadow: var(--box-shadow);
+}
+
+/* NAVBAR */
+
+.navbar{
+    box-shadow: var(--box-shadow);
+}
+
+.navbar-nav .nav-link {
+    font-size: 21px; /* Ajusta el valor según sea necesario */
+    font-weight: 500;
+    color: var(--c-dark);
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--c-brand);
+}
+
+.navbar-nav .nav-link.active {
+    color: var(--c-brand);
+}
+
+/* BTN */
+
+.btn {
+    font-size: 16px; /* Ajusta el valor según sea necesario */
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--c-dark);
+    background-color: var(--c-brand);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.btn-brand {
+    color: white;
+    border-color: var(--c-brand);
+    background-color: var(--c-brand);
+}
+
+.btn-brand:hover {
+    color: black
+}
+
+/* HERO */
+#hero {
+    background: linear-gradient(#00000060, #00000060), url(../images/biblioteca_unam.jpg);
+    background-position: center;
+    background-size: cover;
+}
+#hero h5{
+    font-size: 20px;
+}
+
+/* SECTION TITTLE */
+.section-title{
+    margin-bottom: 60px;
+}
+
+.section-title .line{
+    width: 60px;
+    height: 4px;
+    background-color: var(--c-brand);
+    margin: 16px auto 24px auto;
+}
+
+.section-title p{
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ACERCA DE */
+#about p{
+    font-size: 18px;
+}
+
+#img_curso{
+    border-radius: 20px;
+}
+
+/* ICONBOX */
+.iconbox{
+    width: 70px;
+    height: 70px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--c-brand-rgb), 0.1);
+    color: var(--c-brand);
+    font-size: 34px;
+    flex: none;
+}
+
+/* CURSOS */
+#services p{
+    font-size: 18px;
+}
+
+.service{
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.service::after{
+    content: "";
+    width: 40px;
+    height: 40px;
+    background: rgba(var(--c-brand-rgb), 0.2);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transition: var(--transition);
+}
+
+.service:hover::after{
+    width: 100%;
+    height: 100%;
+    background: var(--c-brand);
+    z-index: -1;
+}
+
+.service:hover h5,
+.service:hover p{
+    color: white;
+}
+
+.service:hover .iconbox{
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* EQUIPO */
+.team-member-content{
+    background-color: var(--c-brand);
+    position: center;
+    padding-top: 24px;    
+    padding-bottom: 24px;
+}
+
+.image-zoom {
+    overflow: hidden;
+  }
+  
+.image-zoom-warpper img {
+    transition: transform 0.3s ease;
+  }
+  
+.image-zoom:hover .image-zoom-warpper img {
+    transform: scale(1.1);
+  }
+
+.team-member{
+    border-radius: 20px;
+}
+
+/* CONTACTO */
+#contact{
+    position: relative;
+    z-index: 2;
+}
+
+#contact::after{
+    content: "";
+    width: 100%;
+    height: 70%;
+    background: linear-gradient(rgba(var(--c-brand-rgb), 0.2), rgba(var(--c-brand-rgb), 0.2)), url(/assets/images/unam2.png);
+    background-position: center;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+
+}
+
+#contact .form-control{
+    border-radius: 0;
+}
+
+#contact .form-control:focus{
+    border-color: var(--c-brand);
+    box-shadow: none;
+}
+
+/* FOOTER */
+footer{
+    padding-top: 60px;
+}
+.footer-top{
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom{
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.logo_footer img{
+    width: 100px;
+}
+
+footer li,
+footer p,
+footer a{
+    color: white;
+}
+
+footer ul{
+    list-style: none;
+    padding: 0;
+}
+
+footer .line{
+    width: 40px;
+    height: 4px;
+    background-color: var(--c-brand);
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
+.social-icons a{
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+}
+
+.social-icons a:hover{
+    background-color: var(--c-brand);
+    color: white;
+}
