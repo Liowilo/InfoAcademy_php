@@ -1,0 +1,257 @@
+@import url(../css/clash-display.css);
+
+:root{
+    --c-dark: #212529;
+    --c-brand: #4e57d4;
+    --c-brand-light: #4e57d4;
+    --c-brand-rgb: 78, 87, 212;
+    --c-body: #727272;
+    --font-base: "ClashDisplay", sans-serif;
+    --box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.08);
+    --transition: all 0.5s ease;
+}
+
+body{
+    font-family: var(--font-base);
+    line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6{
+    font-weight: 600;
+    color: var(--c-dark);
+}
+
+a{
+    color: white;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover{
+    color: var(--c-brand-light);
+}
+
+.logos-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinea los elementos al principio del contenedor */
+    width: 15%;
+}
+
+.logos-left img {
+    margin-right: 30px; /* Ajusta el espacio entre las imágenes si es necesario */
+}
+
+.theme-shadow {
+    box-shadow: var(--box-shadow);
+}
+
+/* NAVBAR */
+.navbar{
+    box-shadow: var(--box-shadow);
+}
+
+.navbar-nav .nav-link {
+    font-size: 21px; /* Ajusta el valor según sea necesario */
+    font-weight: 500;
+    color: white;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffb703;
+}
+
+.navbar-nav .nav-link.active {
+    color: #ffb703;
+}
+
+/* USERNAME */
+.user-name{
+    font-size: 24px; /* Ajusta el valor según sea necesario */
+    font-weight: 600;
+    color: white;
+    padding: 10px 30px;
+    padding-top: 20px;
+}
+
+/* DROPDOWN */
+.dropdown{
+    padding-top: 12px;
+}
+
+/* BTN */
+.btn {
+    font-size: 16px; /* Ajusta el valor según sea necesario */
+    font-weight: 600;
+    text-transform: uppercase;
+    background-color: var(--c-brand);
+    border: none;
+    padding: 10px 15px;
+    padding-top: 10px;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.btn-brand {
+    color: white;
+    border-color: var(--c-brand);
+    background-color: var(--c-brand);
+}
+
+.btn-brand:hover {
+    color: #ffb703;
+    border-color: var(--c-brand);
+    background-color: var(--c-brand);
+}
+
+/* SEGUNDO NAVBAR */
+.second-navbar .nav-link {
+    font-size: 16px;  /* Cambia el tamaño de la letra */
+    padding: 10px 15px;  /* Cambia el padding (arriba/abajo 10px, izquierda/derecha 15px) */
+    padding-bottom: 3px;
+}
+
+
+/* HERO */
+.hero-section {
+    background-color: #282A35; /* Dark background */
+    color: #fff; /* White text */
+    padding: 100px 0;
+    padding-top: 80px;
+    padding-bottom: 130px;
+    position: relative;
+    overflow: hidden;
+}
+
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.hero-section h1{
+    font-weight: 600;
+    color: white;
+}
+
+.hero-section .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.5;
+}
+
+.search-form {
+    max-width: 1000px; /* Adjust the width as needed */
+    width: 100%;
+}
+
+.search-input {
+    flex: 1;
+    max-width: 550px; /* Adjust the width of the search input */
+}
+
+.search-button {
+    width: auto;
+    white-space: nowrap;
+}
+
+/* MAIN CONTENT */
+/* HTML */
+
+.html-section {
+    background-color: #EE6329; /* Light background */
+    padding: 50px 0;
+    color: #fff;
+}
+
+.html-section h1 {
+    color: #fff;
+}
+
+.html-section h2 {
+    font-size: 2.5rem;
+}
+
+.html-section pre {
+    background-color: #2b2d42;
+    color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* CSS */
+/* Content Section Styling */
+/* CSS */
+/* Content Section Styling */
+.css-section {
+    background-color: #12A0DE; /* Light background */
+    padding: 50px 0;
+    color: #fff;
+}
+
+.css-section h2 {
+    font-size: 2.5rem;
+}
+
+.css-section pre {
+    background-color: #2b2d42;
+    color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* JAVASCRIPT */
+.js-section {
+    background-color: #EFD81D;
+    padding: 50px 0;
+    padding-top: 130px;
+    padding-bottom: 130px;
+}
+
+.js-section h2 {
+    font-size: 2.5rem;
+}
+
+.js-section pre {
+    background-color: #2b2d42;
+    color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* PYTHON */
+
+.python-section {
+    background-color: #3572A4;
+    padding: 50px 0;
+    color: #fff;
+}
+
+.python-section h1 {
+    color: #fff;
+}
+
+.python-section h2 {
+    font-size: 2.5rem;
+}
+
+.python-section pre {
+    background-color: #2b2d42;
+    color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+}
