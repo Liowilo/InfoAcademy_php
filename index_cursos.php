@@ -196,13 +196,6 @@ print(f"La suma de {numero1} y {numero2} es: {suma}")
             </div>
         </div>
     </section>
-
-
-
-
-
-    <h1>CURSOS</h1>
-    <p>Hola!, <?php echo $user_data['user_name']; ?>^-^ </p>
     <?php include './components/footer.php'; ?>
     <script>
         Prism.highlightAll();

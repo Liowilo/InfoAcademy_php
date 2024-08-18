@@ -1,0 +1,106 @@
+@import url(../css/clash-display.css);
+
+:root{
+    --c-dark: #212529;
+    --c-brand: #4e57d4;
+    --c-brand-light: #4e57d4;
+    --c-brand-rgb: 78, 87, 212;
+    --c-body: #727272;
+    --font-base: "ClashDisplay", sans-serif;
+    --box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.08);
+    --transition: all 0.5s ease;
+}
+
+body{
+    font-family: var(--font-base);
+    line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6{
+    font-weight: 600;
+    color: var(--c-dark);
+}
+
+a{
+    color: white;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover{
+    color: var(--c-brand-light);
+}
+
+.logos-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alinea los elementos al principio del contenedor */
+    width: 15%;
+}
+
+.logos-left img {
+    margin-right: 30px; /* Ajusta el espacio entre las imágenes si es necesario */
+}
+
+.theme-shadow {
+    box-shadow: var(--box-shadow);
+}
+
+/* NAVBAR */
+.navbar{
+    box-shadow: var(--box-shadow);
+}
+
+.navbar-nav .nav-link {
+    font-size: 21px; /* Ajusta el valor según sea necesario */
+    font-weight: 500;
+    color: white;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffb703;
+}
+
+.navbar-nav .nav-link.active {
+    color: #ffb703;
+}
+
+/* USERNAME */
+.user-name{
+    font-size: 24px; /* Ajusta el valor según sea necesario */
+    font-weight: 600;
+    color: white;
+    padding: 10px 30px;
+    padding-top: 20px;
+}
+
+/* DROPDOWN */
+.dropdown{
+    padding-top: 12px;
+}
+
+/* BTN */
+.btn {
+    font-size: 16px; /* Ajusta el valor según sea necesario */
+    font-weight: 600;
+    text-transform: uppercase;
+    background-color: var(--c-brand);
+    border: none;
+    padding: 10px 15px;
+    padding-top: 10px;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.btn-brand {
+    color: white;
+    border-color: var(--c-brand);
+    background-color: var(--c-brand);
+}
+
+.btn-brand:hover {
+    color: #ffb703;
+    border-color: var(--c-brand);
+    background-color: var(--c-brand);
+}
