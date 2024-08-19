@@ -1,196 +1,128 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import random
-from database import store_exercise_result, get_user_performance
+from database import get_db_connection, store_exercise_result, get_user_performance, update_user_streak, update_daily_tracking
+from ml_utils import generate_recommendation
+import tensorflow as tf
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
 
-questions = [
-    {
-        "question": "¿Cuál es la etiqueta HTML para crear un enlace?",
-        "answer": "<a>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear una lista no ordenada?",
-        "answer": "<ul>"
-    },
-    {
-        "question": "¿Cuál es la etiqueta para crear un encabezado de nivel 1?",
-        "answer": "<h1>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear una tabla?",
-        "answer": "<table>"
-    },
-    {
-        "question": "¿Cuál es la etiqueta para crear un párrafo?",
-        "answer": "<p>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un botón?",
-        "answer": "<button>"
-    },
-    {
-        "question": "¿Cuál es la etiqueta para crear un input de texto?",
-        "answer": "<input>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear una imagen?",
-        "answer": "<img>"
-    },
-    {
-        "question": "¿Cuál es la etiqueta para crear una lista ordenada?",
-        "answer": "<ol>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un encabezado de nivel 2?",
-        "answer": "<h2>"
-    },
-    {
-        "question": "¿Cuál es la etiqueta para crear un enlace a un archivo CSS?",
-        "answer": "<link>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un encabezado de nivel 3?",
-        "answer": "<h3>"
-    },
-    {
-        "question": "¿Cuál es la etiqueta para crear un enlace a un archivo JavaScript?",
-        "answer": "<script>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un encabezado de nivel 4?",
-        "answer": "<h4>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un encabezado de nivel 5?",
-        "answer": "<h5>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un encabezado de nivel 6?",
-        "answer": "<h6>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un párrafo de texto grande?",
-        "answer": "<big>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un párrafo de texto pequeño?",
-        "answer": "<small>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un salto de línea?",
-        "answer": "<br>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un espacio en blanco?",
-        "answer": "<nbsp>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un div?",
-        "answer": "<div>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un span?",
-        "answer": "<span>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un formulario?",
-        "answer": "<form>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo checkbox?",
-        "answer": "<input type='checkbox'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo radio?",
-        "answer": "<input type='radio'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo submit?",
-        "answer": "<input type='submit'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo text?",
-        "answer": "<input type='text'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo password?",
-        "answer": "<input type='password'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo file?",
-        "answer": "<input type='file'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo hidden?",
-        "answer": "<input type='hidden'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo image?",
-        "answer": "<input type='image'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo reset?",
-        "answer": "<input type='reset'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo button?",
-        "answer": "<input type='button'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo color?",
-        "answer": "<input type='color'>"
-    },
-    {
-        "question": "¿Qué etiqueta se usa para crear un input de tipo date?",
-        "answer": "<input type='date'>"
-    },
-    {
-        "question": "Escribe el código HTML para crear una lista desordenada con los nombres `Pepe`, `Juan` y `Ana`.",
-        "answer": "<ul><li>Pepe</li><li>Juan</li><li>Ana</li></ul>"
-    }
-    # Añade más preguntas aquí
-]
+# Cargar el modelo entrenado
+# model = tf.keras.models.load_model('path_to_your_saved_model')
+
+def get_random_question(difficulty=None):
+    connection = get_db_connection()
+    if connection is None:
+        return None
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+        
+        query = "SELECT id, pregunta, respuesta, dificultad, lenguaje_id FROM ejercicios WHERE lenguaje_id = 1"
+        params = []
+        
+        if difficulty:
+            query += " AND dificultad = %s"
+            params.append(difficulty)
+        
+        query += " ORDER BY RAND() LIMIT 1"
+        
+        cursor.execute(query, params)
+        
+        question = cursor.fetchone()
+        
+        return question
+    
+    except Error as e:
+        print(f"Error: {e}")
+        return None
+    
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
 
 @app.route('/get_question', methods=['GET'])
 def get_question():
-    question = random.choice(questions)
-    return jsonify({"question": question["question"]})
+    difficulty = request.args.get('difficulty', type=int)
+    question = get_random_question(difficulty)
+    if question:
+        return jsonify({
+            "id": question['id'],
+            "question": question['pregunta'],
+            "difficulty": question['dificultad'],
+            "language_id": question['lenguaje_id']
+        })
+    else:
+        return jsonify({"error": "No se pudo obtener una pregunta"}), 500
 
 @app.route('/check_answer', methods=['POST'])
 def check_answer():
     data = request.json
     user_answer = data['answer']
-    question = data['question']
-    user_id = data.get('user_id', 1)  # Asume un ID de usuario por defecto si no se proporciona
-    time_taken = data.get('time_taken', 0)  # Tiempo en segundos
+    question_id = data['question_id']
+    user_id = data.get('user_id', 1)
+    time_taken = data.get('time_taken', 0)
     
-    for q in questions:
-        if q['question'] == question:
-            correct_answer = q['answer']
-            break
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+
+    try:
+        cursor = connection.cursor(dictionary=True)
+        
+        query = "SELECT respuesta, dificultad, lenguaje_id FROM ejercicios WHERE id = %s"
+        cursor.execute(query, (question_id,))
+        
+        result = cursor.fetchone()
+        
+        if result:
+            correct_answer = result['respuesta']
+            difficulty = result['dificultad']
+            language_id = result['lenguaje_id']
+            is_correct = user_answer.lower().strip() == correct_answer.lower()
+            
+            store_exercise_result(user_id, question_id, user_answer, is_correct, time_taken, language_id, difficulty)
+            update_user_streak(user_id)
+            update_daily_tracking(user_id, language_id, 1, time_taken)
+            
+            return jsonify({
+                "is_correct": is_correct,
+                "correct_answer": correct_answer,
+                "difficulty": difficulty
+            })
+        else:
+            return jsonify({"error": "Pregunta no encontrada"}), 404
     
-    is_correct = user_answer.lower().strip() == correct_answer.lower()
+    except Error as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "Error al procesar la respuesta"}), 500
     
-    # Almacena el resultado en la base de datos
-    store_exercise_result(user_id, question, user_answer, is_correct, time_taken)
-    
-    return jsonify({
-        "is_correct": is_correct,
-        "correct_answer": correct_answer
-    })
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
 
 @app.route('/get_performance', methods=['GET'])
 def get_performance():
-    user_id = request.args.get('user_id', 1)  # Asume un ID de usuario por defecto si no se proporciona
-    performance_data = get_user_performance(user_id)
+    user_id = request.args.get('user_id', 1, type=int)
+    language_id = request.args.get('language_id', 1, type=int)  # Asumimos que HTML tiene id 1
+    performance_data = get_user_performance(user_id, language_id)
     
     if performance_data is None:
         return jsonify({"error": "No se pudo obtener el rendimiento del usuario"}), 500
     
     return jsonify(performance_data)
+
+@app.route('/get_recommendation', methods=['GET'])
+def get_recommendation():
+    user_id = request.args.get('user_id', type=int)
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+    
+    recommendation = generate_recommendation(user_id)
+    return jsonify({"recommendation": recommendation})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

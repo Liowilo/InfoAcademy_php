@@ -30,6 +30,16 @@ $user_data = check_login($con);
                     <div class="card-body">
                         <h3 class="card-title text-white">Ejercicio:</h3>
                         <div id="exercise-prompt" class="card-text text-white"></div>
+                        <div id="difficulty-display" class="mt-2 text-white"></div>
+                        <div class="mt-3">
+                            <label for="difficulty-select" class="form-label text-white">Seleccionar dificultad:</label>
+                            <select id="difficulty-select" class="form-select">
+                                <option value="">Todas las dificultades</option>
+                                <option value="1">Fácil</option>
+                                <option value="2">Medio</option>
+                                <option value="3">Difícil</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,7 +52,7 @@ $user_data = check_login($con);
                         <div id="feedback" class="mt-3"></div>
                         <button id="get-performance" class="btn btn-secondary mt-3">Ver rendimiento</button>
                         <div id="performance-display" class="mt-3"></div>
-                        <div id="feedback" class="mt-3"></div>
+                        <div id="recommendation-display" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -55,6 +65,8 @@ $user_data = check_login($con);
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const exercisePrompt = document.getElementById('exercise-prompt');
+            const difficultyDisplay = document.getElementById('difficulty-display');
+            const difficultySelect = document.getElementById('difficulty-select');
             const userAnswer = document.getElementById('user-answer');
             const checkAnswerBtn = document.getElementById('check-answer');
             const feedback = document.getElementById('feedback');
@@ -62,21 +74,87 @@ $user_data = check_login($con);
             const performanceDisplay = document.getElementById('performance-display');
 
             let currentQuestion = '';
+            let currentQuestionId = '';
             let startTime;
 
+            function typeWriter(element, text, speed = 50) {
+                let i = 0;
+                element.textContent = ''; // Clear existing text
+                function type() {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(type, speed);
+                    }
+                }
+                type();
+            }
+
             function getNewQuestion() {
-                fetch('http://localhost:5000/get_question')
+                const difficulty = difficultySelect.value;
+                let url = 'http://localhost:5000/get_question';
+                if (difficulty) {
+                    url += `?difficulty=${difficulty}`;
+                }
+                fetch(url)
                     .then(response => response.json())
                     .then(data => {
+                        currentQuestionId = data.id;
                         currentQuestion = data.question;
-                        exercisePrompt.textContent = currentQuestion;
+                        typeWriter(exercisePrompt, currentQuestion);
+                        difficultyDisplay.textContent = `Dificultad: ${getDifficultyText(data.difficulty)}`;
                         startTime = new Date();
                         userAnswer.value = '';
+                        feedback.textContent = '';
+
+                        // Disable the answer input and check button during animation
+                        userAnswer.disabled = true;
+                        checkAnswerBtn.disabled = true;
+
+                        // Enable them after the animation is complete
+                        setTimeout(() => {
+                            userAnswer.disabled = false;
+                            checkAnswerBtn.disabled = false;
+                            userAnswer.focus(); // Set focus to the answer input
+                        }, currentQuestion.length * 50 + 100); // Add a small buffer
+                    });
+            }
+
+            function getDifficultyText(difficulty) {
+                switch (difficulty) {
+                    case 1:
+                        return 'Fácil';
+                    case 2:
+                        return 'Medio';
+                    case 3:
+                        return 'Difícil';
+                    default:
+                        return 'Desconocido';
+                }
+            }
+
+            function getRecommendation() {
+                fetch(`http://localhost:5000/get_recommendation?user_id=<?php echo $user_data['id']; ?>`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Error:', data.error);
+                        } else {
+                            const recommendationDisplay = document.getElementById('recommendation-display');
+                            recommendationDisplay.textContent = `Recomendación: Enfócate en practicar ${data.recommendation}`;
+                            recommendationDisplay.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
                     });
             }
 
             getNewQuestion();
 
+            difficultySelect.addEventListener('change', getNewQuestion);
+
+            document.addEventListener('DOMContentLoaded', getRecommendation);
             checkAnswerBtn.addEventListener('click', function() {
                 const endTime = new Date();
                 const timeTaken = (endTime - startTime) / 1000; // Tiempo en segundos
@@ -87,10 +165,11 @@ $user_data = check_login($con);
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            question: currentQuestion,
+                            question_id: currentQuestionId,
                             answer: userAnswer.value,
-                            user_id: 1, // Asume un ID de usuario fijo por ahora
-                            time_taken: timeTaken
+                            user_id: <?php echo $user_data['id']; ?>,
+                            time_taken: timeTaken,
+                            language_id: 1 // Asumimos que 1 es para HTML
                         }),
                     })
                     .then(response => response.json())
@@ -102,17 +181,45 @@ $user_data = check_login($con);
                             feedback.textContent = `Incorrecto. La respuesta correcta es: ${data.correct_answer}`;
                             feedback.style.color = 'red';
                         }
-                        getNewQuestion();
+
+                        // Deshabilitar el botón de revisar respuesta y el campo de texto
+                        checkAnswerBtn.disabled = true;
+                        userAnswer.disabled = true;
+
+                        // Esperar 2 segundos antes de cargar la siguiente pregunta
+                        setTimeout(() => {
+                            getNewQuestion();
+                        }, 2000);
+                        getRecommendation();
                     });
             });
 
             performanceBtn.addEventListener('click', function() {
-                fetch('http://localhost:5000/get_performance?user_id=1') // Asume un ID de usuario fijo por ahora
+                fetch(`http://localhost:5000/get_performance?user_id=<?php echo $user_data['id']; ?>&language_id=1`)
                     .then(response => response.json())
                     .then(data => {
-                        performanceDisplay.textContent = `Ejercicios completados: ${data.ejercicios_completados}, 
-                                                  Tasa de aciertos: ${(data.tasa_aciertos * 100).toFixed(2)}%, 
-                                                  Tiempo promedio: ${data.tiempo_promedio.toFixed(2)} segundos`;
+                        if (data.error) {
+                            performanceDisplay.textContent = `Error: ${data.error}`;
+                            performanceDisplay.style.color = 'red';
+                        } else {
+                            const ejerciciosCompletados = data.ejercicios_completados || 0;
+                            const tasaAciertos = (data.tasa_aciertos != null) ? (data.tasa_aciertos * 100).toFixed(2) : 'N/A';
+                            const tiempoPromedio = (data.tiempo_promedio != null) ? data.tiempo_promedio.toFixed(2) : 'N/A';
+
+                            performanceDisplay.innerHTML = `
+                        <div style="color: white; text-align: left;">
+                            Ejercicios completados: ${ejerciciosCompletados}<br>
+                            Tasa de aciertos: ${tasaAciertos}%<br>
+                            Tiempo promedio: ${tiempoPromedio} segundos
+                        </div>
+                    `;
+                        }
+                        performanceDisplay.style.display = 'block';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        performanceDisplay.textContent = 'Error al obtener el rendimiento';
+                        performanceDisplay.style.color = 'red';
                     });
             });
         });
