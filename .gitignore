@@ -2,7 +2,7 @@
 .DS_Store
 Thumbs.db
 
-# Ignora el entorno virtual de Python
+# Ignore entire virtual environment
 assets/python/myenv/
 
 # Ignora archivos compilados de Python
