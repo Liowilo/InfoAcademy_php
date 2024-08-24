@@ -15,6 +15,11 @@ $user_data = check_login($con);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
     <link rel="stylesheet" href="./assets/css/navbar.css">
     <link rel="stylesheet" href="./assets/css/ejercicios.css">
     <title>Ejercicios HTML</title>
@@ -47,12 +52,12 @@ $user_data = check_login($con);
                 <div class="card">
                     <div class="card-body">
                         <h3 class="card-title text-white">Tu respuesta:</h3>
-                        <textarea id="user-answer" class="form-control" rows="10"></textarea>
+                        <textarea id="user-answer" class="form-control"></textarea>
                         <button id="check-answer" class="btn btn-primary mt-3">Revisar respuesta</button>
                         <div id="feedback" class="mt-3"></div>
                         <button id="get-performance" class="btn btn-secondary mt-3">Ver rendimiento</button>
                         <div id="performance-display" class="mt-3"></div>
-                        <div id="recommendation-display" style="display: none;"></div>
+                        <div id="recommendation-display" style="display: none;" class="text-white"></div>
                     </div>
                 </div>
             </div>
@@ -76,6 +81,37 @@ $user_data = check_login($con);
             let currentQuestion = '';
             let currentQuestionId = '';
             let startTime;
+
+            const editor = CodeMirror.fromTextArea(userAnswer, {
+                mode: "text/html",
+                theme: "dracula",
+                lineNumbers: true,
+                autoCloseTags: true,
+                autoCloseBrackets: true,
+                matchBrackets: true,
+                indentUnit: 2,
+                tabSize: 2,
+                indentWithTabs: false,
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete",
+                    "Enter": "newlineAndIndentContinueComment"
+                }
+            });
+
+            // Forzar el modo HTML
+            editor.setOption("mode", "text/html");
+
+            // Ajustar el comportamiento de la tecla Enter
+            editor.on("keydown", function(cm, event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    var cursor = cm.getCursor();
+                    var line = cm.getLine(cursor.line);
+                    var indentation = line.match(/^\s*/)[0];
+                    cm.replaceSelection("\n" + indentation);
+                    cm.setCursor(cursor.line + 1, indentation.length);
+                }
+            });
 
             function typeWriter(element, text, speed = 50) {
                 let i = 0;
@@ -166,7 +202,7 @@ $user_data = check_login($con);
                         },
                         body: JSON.stringify({
                             question_id: currentQuestionId,
-                            answer: userAnswer.value,
+                            answer: editor.getValue().trim(),
                             user_id: <?php echo $user_data['id']; ?>,
                             time_taken: timeTaken,
                             language_id: 1 // Asumimos que 1 es para HTML
@@ -207,19 +243,40 @@ $user_data = check_login($con);
                             const tiempoPromedio = (data.tiempo_promedio != null) ? data.tiempo_promedio.toFixed(2) : 'N/A';
 
                             performanceDisplay.innerHTML = `
-                        <div style="color: white; text-align: left;">
-                            Ejercicios completados: ${ejerciciosCompletados}<br>
-                            Tasa de aciertos: ${tasaAciertos}%<br>
-                            Tiempo promedio: ${tiempoPromedio} segundos
-                        </div>
-                    `;
+                    <div style="color: white; text-align: left;">
+                        Ejercicios completados: ${ejerciciosCompletados}<br>
+                        Tasa de aciertos: ${tasaAciertos}%<br>
+                        Tiempo promedio: ${tiempoPromedio} segundos
+                    </div>
+                `;
                         }
                         performanceDisplay.style.display = 'block';
+                        performanceDisplay.style.opacity = '1'; 
+
+                        // Aplicar el fade-out después de 4 segundos
+                        setTimeout(() => {
+                            performanceDisplay.classList.add('fade-out');
+                            setTimeout(() => {
+                                performanceDisplay.style.display = 'none';
+                                performanceDisplay.classList.remove('fade-out');
+                            }, 1000);
+                        }, 4000);
                     })
                     .catch(error => {
                         console.error('Error:', error);
                         performanceDisplay.textContent = 'Error al obtener el rendimiento';
                         performanceDisplay.style.color = 'red';
+                        performanceDisplay.style.display = 'block';
+                        performanceDisplay.style.opacity = '1'; 
+
+                        // También aplicar el fade-out para el mensaje de error
+                        setTimeout(() => {
+                            performanceDisplay.classList.add('fade-out');
+                            setTimeout(() => {
+                                performanceDisplay.style.display = 'none';
+                                performanceDisplay.classList.remove('fade-out');
+                            }, 1000);
+                        }, 4000);
                     });
             });
         });

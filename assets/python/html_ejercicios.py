@@ -60,7 +60,7 @@ def get_question():
 @app.route('/check_answer', methods=['POST'])
 def check_answer():
     data = request.json
-    user_answer = data['answer']
+    user_answer = data['answer'].lower().strip()
     question_id = data['question_id']
     user_id = data.get('user_id', 1)
     time_taken = data.get('time_taken', 0)
@@ -78,10 +78,10 @@ def check_answer():
         result = cursor.fetchone()
         
         if result:
-            correct_answer = result['respuesta']
+            correct_answer = result['respuesta'].lower().strip()
             difficulty = result['dificultad']
             language_id = result['lenguaje_id']
-            is_correct = user_answer.lower().strip() == correct_answer.lower()
+            is_correct = user_answer == correct_answer
             
             store_exercise_result(user_id, question_id, user_answer, is_correct, time_taken, language_id, difficulty)
             update_user_streak(user_id)
@@ -89,7 +89,7 @@ def check_answer():
             
             return jsonify({
                 "is_correct": is_correct,
-                "correct_answer": correct_answer,
+                "correct_answer": result['respuesta'],  # Devuelve la respuesta original sin modificar
                 "difficulty": difficulty
             })
         else:
@@ -125,4 +125,4 @@ def get_recommendation():
     return jsonify({"recommendation": recommendation})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', port=5000)

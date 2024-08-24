@@ -1,0 +1,69 @@
+# Ignora archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Ignora el entorno virtual de Python
+assets/python/myenv/
+
+# Ignora archivos compilados de Python
+*.pyc
+__pycache__/
+assets/python/__pycache__/
+
+# Ignora archivos de caché de Python
+*.py[cod]
+*$py.class
+
+# Ignora archivos grandes o modelos
+assets/python/*.h5
+
+# Ignora archivos de base de datos (si los tienes)
+*.sqlite3
+*.db
+
+# Ignora archivos de configuración local
+*.env
+config.local.yml
+
+# Ignora node_modules si estás usando npm
+node_modules/
+
+# Ignora archivos de log
+*.log
+
+# Ignora archivos temporales
+*.tmp
+
+# Ignora archivos de IDE
+.vscode/
+.idea/
+
+# Ignora el archivo de requerimientos (opcional, depende si quieres versionarlo)
+# assets/python/requirements.txt
+
+# Ignora archivos específicos grandes (ajusta según sea necesario)
+assets/python/recommendation_model.h5
+
+# Ignora carpetas de datos si las tienes
+assets/python/data/
+assets/python/datasets/
+
+# Ignora archivos de respaldo
+*~
+*.bak
+
+# Ignora archivos compilados de JavaScript
+*.min.js
+
+# Ignora archivos compilados de CSS
+*.min.css
+
+# Ignora archivos de configuración local de PHP (si los tienes)
+config.php
+
+# Ignora archivos de sesión de PHP
+sess_*
+
+# Ignora archivos de caché de composer si lo usas
+vendor/
+composer.lock
