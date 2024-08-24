@@ -3,7 +3,11 @@
 Thumbs.db
 
 # Ignore entire virtual environment
-assets/python/myenv/
+assets/python/myenv/    
+# Ignore any virtual environment in the project
+   **/venv/
+   **/env/
+   **/.venv/
 
 # Ignora archivos compilados de Python
 *.pyc
