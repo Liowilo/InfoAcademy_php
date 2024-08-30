@@ -57,7 +57,6 @@ $user_data = check_login($con);
                         <button id="get-performance" class="btn btn-secondary mt-3">Ver rendimiento</button>
                         <div id="performance-display" class="mt-3"></div>
                         <div id="recommendation-display" style="display: none;" class="text-white"></div>
-                        <button id="test-connection" class="btn btn-secondary mt-3">Probar conexión con el servidor</button>
                     </div>
                 </div>
             </div>
@@ -97,7 +96,7 @@ $user_data = check_login($con);
                 }
             });
 
-            function typeWriter(element, text, speed = 50) {
+            function typeWriter(element, text, speed = 30) {
                 let i = 0;
                 element.textContent = '';
 
@@ -113,6 +112,7 @@ $user_data = check_login($con);
 
             function getNewQuestion() {
                 const difficulty = difficultySelect.value;
+                difficultySelect.disabled = true;
                 let url = 'http://localhost:5000/get_js_question';
                 if (difficulty) {
                     url += `?difficulty=${difficulty}`;
@@ -121,8 +121,7 @@ $user_data = check_login($con);
                     .then(response => response.json())
                     .then(data => {
                         currentQuestionId = data.id;
-                        currentQuestion = data.question;
-                        typeWriter(exercisePrompt, currentQuestion);
+                        typeWriter(exercisePrompt, data.question);
                         difficultyDisplay.textContent = `Dificultad: ${getDifficultyText(data.difficulty)}`;
                         startTime = new Date();
                         editor.setValue(''); // Iniciar con el editor vacío
@@ -131,11 +130,17 @@ $user_data = check_login($con);
                         editor.setOption('readOnly', true);
                         checkAnswerBtn.disabled = true;
 
+                        const typingTime = Math.min(data.question.length * 25, 2000); // Máximo 2 segundos
                         setTimeout(() => {
                             editor.setOption('readOnly', false);
+                            difficultySelect.disabled = false;
                             checkAnswerBtn.disabled = false;
                             editor.focus();
-                        }, currentQuestion.length * 50 + 100);
+                        }, typingTime + 100);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener la pregunta:', error);
+                        exercisePrompt.textContent = 'Error al cargar la pregunta. Por favor, intenta de nuevo.';
                     });
             }
 
@@ -190,80 +195,47 @@ $user_data = check_login($con);
                             language_id: 3 // 3 para JavaScript
                         }),
                     })
-                    .then(async response => {
-                        const responseText = await response.text();
-                        console.log('Respuesta completa del servidor:', responseText);
-                        let data;
-                        try {
-                            data = JSON.parse(responseText);
-                        } catch (error) {
-                            console.error('Error parsing JSON:', responseText);
-                            throw new Error('Respuesta del servidor no válida: ' + responseText);
-                        }
-                        if (!response.ok) {
-                            throw new Error(JSON.stringify(data));
-                        }
-                        return data;
-                    })
+                    .then(response => response.json())
                     .then(data => {
                         let feedbackHtml = '';
                         if (data.error) {
-                            if (data.error === "Error de sintaxis en el código") {
-                                feedbackHtml = `<h4 style="color: red;">Error de sintaxis</h4>
-                            <p>Tu código contiene errores de sintaxis. Por favor, revisa tu código y asegúrate de que sea JavaScript válido.</p>`;
-                            } else {
-                                feedbackHtml = `<h4 style="color: red;">Error: ${data.error}</h4>`;
-                            }
+                            feedbackHtml = `<h4 style="color: red;">Error: ${data.error}</h4>`;
                             if (data.details) {
-                                feedbackHtml += `<details>
-                                <summary>Detalles técnicos</summary>
-                                <pre>${data.details}</pre>
-                              </details>`;
+                                feedbackHtml += `<p style="color: white;">Detalles: ${data.details}</p>`;
                             }
-                        } else if (data.is_correct) {
-                            feedbackHtml = '<h4 style="color: green;">¡Correcto! Todos los casos de prueba pasaron.</h4>';
                         } else {
-                            feedbackHtml = '<h4 style="color: red;">Incorrecto. Algunos casos de prueba fallaron.</h4>';
-                        }
+                            if (data.is_correct) {
+                                feedbackHtml = '<h4 style="color: green;">¡Correcto! Todos los casos de prueba pasaron.</h4>';
+                            } else {
+                                feedbackHtml = '<h4 style="color: red;">Incorrecto. Algunos casos de prueba fallaron.</h4>';
+                            }
 
-                        if (data.test_results) {
-                            feedbackHtml += '<h5>Resultados detallados:</h5><ul>';
-                            data.test_results.forEach((result, index) => {
-                                if (result.error) {
-                                    feedbackHtml += `<li style="color: red;">Error en el caso de prueba ${index + 1}: ${result.error}</li>`;
-                                } else {
-                                    const color = result.passed ? 'green' : 'red';
-                                    feedbackHtml += `<li style="color: ${color};">
-                    Caso de prueba ${index + 1}: 
-                    Input: ${result.input}, 
-                    Resultado esperado: ${result.expected}, 
-                    Tu resultado: ${result.result}
-                </li>`;
-                                }
-                            });
-                            feedbackHtml += '</ul>';
+                            if (data.test_results) {
+                                feedbackHtml += '<h5 style="color: white;">Resultados detallados:</h5><ul style="color: white;">';
+                                data.test_results.forEach((result, index) => {
+                                    const statusColor = result.passed ? 'green' : 'red';
+                                    feedbackHtml += `<li>
+            <span style="color: ${statusColor};">${result.passed ? 'Pasado' : 'Fallido'}</span> - 
+            Caso de prueba ${index + 1}:<br>
+            Input: ${JSON.stringify(result.input)}<br>
+            Resultado esperado: ${JSON.stringify(result.expected)}<br>
+            Tu resultado: ${JSON.stringify(result.result)}
+        </li>`;
+                                });
+                                feedbackHtml += '</ul>';
+                            }
                         }
 
                         feedback.innerHTML = feedbackHtml;
                     })
                     .catch(error => {
-                        console.error('Error detallado:', error);
-                        let errorMessage = 'Error desconocido';
-                        let errorDetails = '';
-                        try {
-                            const errorData = JSON.parse(error.message);
-                            errorMessage = errorData.error || errorMessage;
-                            errorDetails = JSON.stringify(errorData, null, 2);
-                        } catch (e) {
-                            errorMessage = error.message;
-                        }
-                        feedback.innerHTML = `<h4 style="color: red;">Error al procesar la respuesta: ${errorMessage}</h4>
-                          <details>
-                            <summary>Detalles técnicos</summary>
-                            <pre>${errorDetails}</pre>
-                          </details>
-                          <p>Por favor, intenta de nuevo. Si el problema persiste, contacta al soporte técnico.</p>`;
+                        console.error('Error:', error);
+                        feedback.innerHTML = `<h4 style="color: red;">Error al procesar la respuesta: ${error.message}</h4>`;
                     });
+                setTimeout(() => {
+                    feedback.innerHTML = '';
+                    getNewQuestion();
+                }, 5000);
             });
 
             performanceBtn.addEventListener('click', function() {
@@ -279,12 +251,12 @@ $user_data = check_login($con);
                             const tiempoPromedio = (data.tiempo_promedio != null) ? data.tiempo_promedio.toFixed(2) : 'N/A';
 
                             performanceDisplay.innerHTML = `
-                                <div style="color: white; text-align: left;">
-                                    Ejercicios completados: ${ejerciciosCompletados}<br>
-                                    Tasa de aciertos: ${tasaAciertos}%<br>
-                                    Tiempo promedio: ${tiempoPromedio} segundos
-                                </div>
-                            `;
+                        <div style="color: white; text-align: left;">
+                            Ejercicios completados: ${ejerciciosCompletados}<br>
+                            Tasa de aciertos: ${tasaAciertos}%<br>
+                            Tiempo promedio: ${tiempoPromedio} segundos
+                        </div>
+                    `;
                         }
                         performanceDisplay.style.display = 'block';
                         performanceDisplay.style.opacity = '1';
@@ -313,18 +285,6 @@ $user_data = check_login($con);
                         }, 4000);
                     });
             });
-        });
-
-        document.getElementById('test-connection').addEventListener('click', function() {
-            fetch('http://localhost:5000/test')
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error al conectar con el servidor: ' + error.message);
-                });
         });
     </script>
 </body>
