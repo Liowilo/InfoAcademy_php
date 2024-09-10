@@ -1,12 +1,11 @@
-from flask import Flask, jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from database import get_db_connection, store_exercise_result, get_user_performance, update_user_streak, update_daily_tracking
 from ml_utils import generate_recommendation
 import tensorflow as tf
 import numpy as np
 
-app = Flask(__name__)
-CORS(app)
+html_bp = Blueprint('html', __name__)
 
 # Cargar el modelo entrenado
 # model = tf.keras.models.load_model('path_to_your_saved_model')
@@ -43,7 +42,7 @@ def get_random_question(difficulty=None):
             cursor.close()
             connection.close()
 
-@app.route('/get_question', methods=['GET'])
+@html_bp.route('/get_question', methods=['GET'])
 def get_question():
     difficulty = request.args.get('difficulty', type=int)
     question = get_random_question(difficulty)
@@ -57,7 +56,7 @@ def get_question():
     else:
         return jsonify({"error": "No se pudo obtener una pregunta"}), 500
 
-@app.route('/check_answer', methods=['POST'])
+@html_bp.route('/check_answer', methods=['POST'])
 def check_answer():
     data = request.json
     user_answer = data['answer'].lower().strip()
@@ -104,7 +103,7 @@ def check_answer():
             cursor.close()
             connection.close()
 
-@app.route('/get_performance', methods=['GET'])
+@html_bp.route('/get_performance', methods=['GET'])
 def get_performance():
     user_id = request.args.get('user_id', 1, type=int)
     language_id = request.args.get('language_id', 1, type=int)  # Asumimos que HTML tiene id 1
@@ -115,7 +114,7 @@ def get_performance():
     
     return jsonify(performance_data)
 
-@app.route('/get_recommendation', methods=['GET'])
+@html_bp.route('/get_recommendation', methods=['GET'])
 def get_recommendation():
     user_id = request.args.get('user_id', type=int)
     if not user_id:
@@ -123,6 +122,3 @@ def get_recommendation():
     
     recommendation = generate_recommendation(user_id)
     return jsonify({"recommendation": recommendation})
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)

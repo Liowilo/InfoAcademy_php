@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from flask_cors import CORS
 from js_evaluator import evaluate_js_code
 from database import (
@@ -15,16 +15,17 @@ import sys
 import json
 import logging
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost"}})
+js_bp = Blueprint('javascript', __name__)
 
+# Configurar logging
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-@app.route("/")
+@js_bp.route("/")
 def home():
     return "Servidor Flask para ejercicios de JavaScript funcionando correctamente."
 
-@app.route("/test")
+@js_bp.route("/test")
 def test():
     return jsonify({"message": "Conexión exitosa al servidor Flask"})
 
@@ -60,7 +61,7 @@ def get_random_js_question(difficulty=None):
             cursor.close()
             connection.close()
 
-@app.route("/get_js_question", methods=["GET"])
+@js_bp.route("/get_js_question", methods=["GET"])
 def get_js_question():
     difficulty = request.args.get("difficulty", type=int)
     question = get_random_js_question(difficulty)
@@ -76,10 +77,10 @@ def get_js_question():
     else:
         return jsonify({"error": "No se pudo obtener una pregunta de JavaScript"}), 500
 
-@app.errorhandler(Exception)
+@js_bp.errorhandler(Exception)
 def handle_exception(e):
-    app.logger.error(f"Unhandled exception: {str(e)}")
-    app.logger.error(traceback.format_exc())
+    logger.error(f"Unhandled exception: {str(e)}")
+    logger.error(traceback.format_exc())
     return (
         jsonify(
             {
@@ -91,14 +92,14 @@ def handle_exception(e):
         500,
     )
 
-@app.route("/check_js_answer", methods=["POST"])
+@js_bp.route("/check_js_answer", methods=["POST"])
 def check_js_answer():
-    app.logger.info("Iniciando check_js_answer")
+    logger.info("Iniciando check_js_answer")
     try:
         data = request.get_json(force=True)
-        app.logger.debug(f"Datos recibidos: {data}")
+        logger.debug(f"Datos recibidos: {data}")
     except json.JSONDecodeError as e:
-        app.logger.error(f"Error al decodificar JSON de la solicitud: {str(e)}")
+        logger.error(f"Error al decodificar JSON de la solicitud: {str(e)}")
         return jsonify({"error": "Solicitud inválida", "details": str(e)}), 400
 
     user_answer = data.get("answer")
@@ -107,16 +108,14 @@ def check_js_answer():
     time_taken = data.get("time_taken", 0)
 
     if not all([user_answer, question_id]):
-        app.logger.warning("Faltan datos requeridos en la solicitud")
+        logger.warning("Faltan datos requeridos en la solicitud")
         return jsonify({"error": "Faltan datos requeridos"}), 400
 
-    app.logger.info(
-        f"Procesando respuesta para pregunta ID: {question_id}, usuario ID: {user_id}"
-    )
+    logger.info(f"Procesando respuesta para pregunta ID: {question_id}, usuario ID: {user_id}")
 
     connection = get_db_connection()
     if connection is None:
-        app.logger.error("No se pudo conectar a la base de datos")
+        logger.error("No se pudo conectar a la base de datos")
         return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
 
     try:
@@ -126,23 +125,21 @@ def check_js_answer():
         cursor.execute(query, (question_id,))
 
         result = cursor.fetchone()
-        app.logger.debug(f"Resultado de la consulta: {result}")
+        logger.debug(f"Resultado de la consulta: {result}")
 
         if result:
             correct_answer = result["respuesta"]
             difficulty = result["dificultad"]
             language_id = result["lenguaje_id"]
 
-            app.logger.info(
-                f"Evaluando respuesta del usuario para el ejercicio ID: {result['id']}"
-            )
-            app.logger.debug(f"Contenido del ejercicio: {correct_answer}")
+            logger.info(f"Evaluando respuesta del usuario para el ejercicio ID: {result['id']}")
+            logger.debug(f"Contenido del ejercicio: {correct_answer}")
 
             try:
                 is_correct, test_results = evaluate_js_code(user_answer, question_id)
                 
                 if isinstance(test_results, list) and len(test_results) == 1 and "error" in test_results[0]:
-                    app.logger.warning(f"Error en la evaluación: {test_results[0]['error']}")
+                    logger.warning(f"Error en la evaluación: {test_results[0]['error']}")
                     return jsonify({
                         "is_correct": False,
                         "error": "Error en la evaluación del código",
@@ -150,11 +147,9 @@ def check_js_answer():
                         "test_results": test_results
                     })
 
-                app.logger.debug(
-                    f"Resultado de la evaluación: is_correct={is_correct}, test_results={test_results}"
-                )
+                logger.debug(f"Resultado de la evaluación: is_correct={is_correct}, test_results={test_results}")
 
-                app.logger.info("Almacenando resultado del ejercicio")
+                logger.info("Almacenando resultado del ejercicio")
                 store_exercise_result(
                     user_id,
                     question_id,
@@ -168,11 +163,11 @@ def check_js_answer():
                 update_daily_tracking(user_id, language_id, 1, time_taken)
 
                 response_data = {"is_correct": is_correct, "test_results": test_results}
-                app.logger.debug(f"Respuesta a enviar: {response_data}")
+                logger.debug(f"Respuesta a enviar: {response_data}")
                 return jsonify(response_data)
 
             except Exception as e:
-                app.logger.error(f"Error al evaluar el código: {str(e)}")
+                logger.error(f"Error al evaluar el código: {str(e)}")
                 error_details = {
                     "error": "Error en la evaluación del código",
                     "details": str(e),
@@ -180,18 +175,17 @@ def check_js_answer():
                     "exercise_content": correct_answer,
                 }
                 if "Los casos de prueba no son JSON válido" in str(e):
-                    # Extraer solo la parte de los casos de prueba
                     test_cases_part = correct_answer.split("//TESTS//")[-1].strip()
                     error_details["test_cases"] = test_cases_part
                 return jsonify(error_details), 500
 
         else:
-            app.logger.warning(f"Pregunta no encontrada: {question_id}")
+            logger.warning(f"Pregunta no encontrada: {question_id}")
             return jsonify({"error": "Pregunta no encontrada"}), 404
 
     except Exception as e:
-        app.logger.error(f"Error inesperado: {str(e)}")
-        app.logger.error(traceback.format_exc())
+        logger.error(f"Error inesperado: {str(e)}")
+        logger.error(traceback.format_exc())
         return (
             jsonify(
                 {
@@ -207,9 +201,9 @@ def check_js_answer():
         if connection and connection.is_connected():
             cursor.close()
             connection.close()
-        app.logger.info("Finalizando check_js_answer")
+        logger.info("Finalizando check_js_answer")
 
-@app.route("/get_js_performance", methods=["GET"])
+@js_bp.route("/get_js_performance", methods=["GET"])
 def get_js_performance():
     user_id = request.args.get("user_id", 1, type=int)
     language_id = 3  # 3 para JavaScript
@@ -225,7 +219,7 @@ def get_js_performance():
 
     return jsonify(performance_data)
 
-@app.route("/get_recommendation", methods=["GET"])
+@js_bp.route("/get_recommendation", methods=["GET"])
 def get_recommendation():
     user_id = request.args.get("user_id", type=int)
     if not user_id:
@@ -233,6 +227,3 @@ def get_recommendation():
 
     recommendation = generate_recommendation(user_id)
     return jsonify({"recommendation": recommendation})
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)

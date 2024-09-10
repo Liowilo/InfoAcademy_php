@@ -1,12 +1,11 @@
-from flask import Flask, jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from database import get_db_connection, store_exercise_result, get_user_performance, update_user_streak, update_daily_tracking
 from ml_utils import generate_recommendation
 import tensorflow as tf
 import numpy as np
 
-app = Flask(__name__)
-CORS(app)
+css_bp = Blueprint('css', __name__)
 
 def get_random_css_question(difficulty=None):
     connection = get_db_connection()
@@ -40,7 +39,7 @@ def get_random_css_question(difficulty=None):
             cursor.close()
             connection.close()
 
-@app.route('/get_css_question', methods=['GET'])
+@css_bp.route('/get_css_question', methods=['GET'])
 def get_css_question():
     difficulty = request.args.get('difficulty', type=int)
     question = get_random_css_question(difficulty)
@@ -54,7 +53,7 @@ def get_css_question():
     else:
         return jsonify({"error": "No se pudo obtener una pregunta de CSS"}), 500
 
-@app.route('/check_css_answer', methods=['POST'])
+@css_bp.route('/check_css_answer', methods=['POST'])
 def check_css_answer():
     data = request.json
     user_answer = data['answer'].lower().strip()
@@ -101,7 +100,7 @@ def check_css_answer():
             cursor.close()
             connection.close()
 
-@app.route('/get_css_performance', methods=['GET'])
+@css_bp.route('/get_css_performance', methods=['GET'])
 def get_css_performance():
     user_id = request.args.get('user_id', 1, type=int)
     language_id = 2  # 2 para CSS
@@ -111,6 +110,3 @@ def get_css_performance():
         return jsonify({"error": "No se pudo obtener el rendimiento del usuario en CSS"}), 500
     
     return jsonify(performance_data)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)

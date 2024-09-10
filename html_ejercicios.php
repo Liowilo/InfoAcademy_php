@@ -128,7 +128,7 @@ $user_data = check_login($con);
 
             function getNewQuestion() {
                 const difficulty = difficultySelect.value;
-                let url = 'http://localhost:5000/get_question';
+                let url = 'http://localhost:5000/html/get_question';
                 if (difficulty) {
                     url += `?difficulty=${difficulty}`;
                 }
@@ -170,7 +170,7 @@ $user_data = check_login($con);
             }
 
             function getRecommendation() {
-                fetch(`http://localhost:5000/get_recommendation?user_id=<?php echo $user_data['id']; ?>`)
+                fetch(`http://localhost:5000/html/get_recommendation?user_id=<?php echo $user_data['id']; ?>`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.error) {
@@ -195,7 +195,7 @@ $user_data = check_login($con);
                 const endTime = new Date();
                 const timeTaken = (endTime - startTime) / 1000; // Tiempo en segundos
 
-                fetch('http://localhost:5000/check_answer', {
+                fetch('http://localhost:5000/html/check_answer', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -231,7 +231,7 @@ $user_data = check_login($con);
             });
 
             performanceBtn.addEventListener('click', function() {
-                fetch(`http://localhost:5000/get_performance?user_id=<?php echo $user_data['id']; ?>&language_id=1`)
+                fetch(`http://localhost:5000/html/get_performance?user_id=<?php echo $user_data['id']; ?>&language_id=1`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.error) {
