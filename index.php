@@ -206,7 +206,7 @@
                                 <img src="./assets/images/leonardo_hernandez.webp" alt="" class="img-fluid">
                             </div>
                             <div class="team-member-content">
-                                <h4 class="text-center text-white">Leonardo Hernandez</h4>
+                                <h4 class="text-center text-white">Leonardo Hernández Carmona</h4>
                                 <p class="text-center mb-0 text-white">Desarrollador web</p>
                             </div>
                         </div>
@@ -214,10 +214,11 @@
                     <div class="col-md-4 col-sm-6 mb-4" data-aos="fade-down" data-aos-delay="250">
                         <div class="team-member image-zoom shadow-lg">
                             <div class="image-zoom-warpper">
-                                <img src="./assets/images/leonardo_hernandez.webp" alt="" class="img-fluid">
+                                <img src="./assets/images/nancy2.webp" alt="" class="img-fluid">
                             </div>
                             <div class="team-member-content">
-                                <h4 class="text-center text-white">Nancy</h4>
+                                <h4 class="text-center text-white">Rosalba Nancy
+                                Rosas Fonseca</h4>
                                 <p class="text-center mb-0 text-white">Desarrolladora web</p>
                             </div>
                         </div>
