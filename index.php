@@ -279,7 +279,7 @@
                         <p>Desbloquea tu potencial con InfoAcademy: el camino hacia la maestría en programación empieza
                             aquí.</p>
                         <div class="social-icons">
-                            <a href=""><i class="ri-github-fill"></i></a>
+                            <a href="https://github.com/Liowilo/InfoAcademy_php" target="_blank" rel="noopener noreferrer"><i class="ri-github-fill"></i></a>
                         </div>
                     </div>
                     <div class="col-lg-3 col-sm-6">
@@ -309,7 +309,7 @@
                         <p class="mb-0">© 2024 InfoAcademy. Todos los derechos reservados.</p>
                     </div>
                     <div class="col-auto">
-                        <p class="mb-0">Diseñado por Leonardo Hernadez</p>
+                        <p class="mb-0">Diseñado por Leonardo Hernádez Carmona</p>
                     </div>
                 </div>
             </div>

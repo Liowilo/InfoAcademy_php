@@ -70,16 +70,16 @@ $user_data = check_login($con);
                     <p>El lenguaje para construir páginas web🛠</p>
                     <a href="#" class="btn btn-success rounded-pill mb-2">Aprende HTML</a>
                     <br>
-                    <a href="#" class="btn btn-warning text-white rounded-pill mb-2">Ejercicios con HTML</a>
+                    <a href="/infoAcademy_php/html_ejercicios.php" class="btn btn-warning text-white rounded-pill mb-2">Ejercicios con HTML</a>
                     <br>
-                    <a href="#" class="btn btn-dark rounded-pill mb-2">Referencia HTML</a>
+                    <a href="https://developer.mozilla.org/es/docs/Web/HTML" target="_blank" rel="noopener noreferrer" class="btn btn-dark rounded-pill mb-2">Referencia HTML</a>
                     <br>
                 </div>
                 <div class="col-md-6">
                     <div class="bg-dark text-light p-3 rounded">
                         <h5 class="text-white">HTML Ejemplo:</h5>
                         <pre><code id="typed" class="language-markup"></code></pre>
-                        <a href="#" class="btn btn-success mt-3">Pruébalo tú mismo...</a>
+                        <a href="/infoAcademy_php/html_ejercicios.php" class="btn btn-success mt-3">Pruébalo tú mismo...</a>
                     </div>
                 </div>
             </div>
@@ -95,9 +95,9 @@ $user_data = check_login($con);
                     <p>El lenguaje para estilizar páginas web🖌</p>
                     <a href="#" class="btn btn-success rounded-pill mb-2">Aprende CSS</a>
                     <br>
-                    <a href="#" class="btn btn-warning text-white rounded-pill mb-2">Ejercicios con CSS</a>
+                    <a href="/infoAcademy_php/css_ejercicios.php" class="btn btn-warning text-white rounded-pill mb-2">Ejercicios con CSS</a>
                     <br>
-                    <a href="#" class="btn btn-dark rounded-pill mb-2">Referencia CSS</a>
+                    <a href="https://developer.mozilla.org/es/docs/Web/CSS" target="_blank" rel="noopener noreferrer" class="btn btn-dark rounded-pill mb-2">Referencia CSS</a>
                     <br>
                 </div>
                 <div class="col-md-6">
@@ -115,7 +115,7 @@ h1 {
 p {
     font-family: verdana;
 }</code></pre>
-                        <a href="#" class="btn btn-success mt-3">Pruébalo tú mismo...</a>
+                        <a href="/infoAcademy_php/css_ejercicios.php" class="btn btn-success mt-3">Pruébalo tú mismo...</a>
                     </div>
                 </div>
             </div>
@@ -131,9 +131,9 @@ p {
                     <p>El lenguaje para dar vida a las páginas web❤</p>
                     <a href="#" class="btn btn-success rounded-pill mb-2">Aprende JavaScript</a>
                     <br>
-                    <a href="#" class="btn btn-warning text-white rounded-pill mb-2">Ejercicios con JavaScript</a>
+                    <a href="/infoAcademy_php/javascript_ejercicios.php" class="btn btn-warning text-white rounded-pill mb-2">Ejercicios con JavaScript</a>
                     <br>
-                    <a href="#" class="btn btn-dark rounded-pill mb-2">Referencia JavaScript</a>
+                    <a href="https://developer.mozilla.org/es/docs/Web/JavaScript" target="_blank" rel="noopener noreferrer" class="btn btn-dark rounded-pill mb-2">Referencia JavaScript</a>
                     <br>
                 </div>
                 <div class="col-md-6">
@@ -146,7 +146,7 @@ p {
 let resultado = sumar(5, 3);
 console.log("El resultado es: " + resultado); // El resultado es: 8
 </code></pre>
-                        <a href="#" class="btn btn-success mt-3">Pruébalo tú mismo...</a>
+                        <a href="/infoAcademy_php/javascript_ejercicios.php" class="btn btn-success mt-3">Pruébalo tú mismo...</a>
                     </div>
                 </div>
             </div>
@@ -162,9 +162,9 @@ console.log("El resultado es: " + resultado); // El resultado es: 8
                     <p>El lenguaje para ideal para la ciencia de datos🔬📚📈</p>
                     <a href="#" class="btn btn-success rounded-pill mb-2">Aprende Python</a>
                     <br>
-                    <a href="#" class="btn btn-warning text-white rounded-pill mb-2">Ejercicios con Python</a>
+                    <a href="/infoAcademy_php/python_ejercicios.php" class="btn btn-warning text-white rounded-pill mb-2">Ejercicios con Python</a>
                     <br>
-                    <a href="#" class="btn btn-dark rounded-pill mb-2">Referencia Python</a>
+                    <a href="https://docs.python.org/es/3/" target="_blank" rel="noopener noreferrer" class="btn btn-dark rounded-pill mb-2">Referencia Python</a>
                     <br>
                 </div>
                 <div class="col-md-6">
@@ -190,7 +190,7 @@ suma = sumar(numero1, numero2)
 print(f"La suma de {numero1} y {numero2} es: {suma}")
 
 </code></pre>
-                        <a href="#" class="btn btn-success mt-3">Pruébalo tú mismo...</a>
+                        <a href="/infoAcademy_php/python_ejercicios.php" class="btn btn-success mt-3">Pruébalo tú mismo...</a>
                     </div>
                 </div>
             </div>

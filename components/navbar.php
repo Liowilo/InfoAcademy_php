@@ -20,8 +20,10 @@
                         <i class="ri-video-fill"></i>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><a class="dropdown-item" href="#">HTML</a></li>
+                        <li><a class="dropdown-item" href="#">CSS</a></li>
+                        <li><a class="dropdown-item" href="#">JavaScript</a></li>
+                        <li><a class="dropdown-item" href="#">Python</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -34,16 +36,14 @@
                         <i class="ri-code-box-fill"></i>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        <li><a class="dropdown-item" href="/infoAcademy_php/html_ejercicios.php">HTML</a></li>
+                        <li><a class="dropdown-item" href="/infoAcademy_php/css_ejercicios.php">CSS</a></li>
+                        <li><a class="dropdown-item" href="/infoAcademy_php/javascript_ejercicios.php">JavaScript</a></li>
+                        <li><a class="dropdown-item" href="/infoAcademy_php/python_ejercicios.php">Python</a></li>
                     </ul>
                 </li>
             </ul>
-            <a href="./login.php" class="btn btn-brand ms-lg-3">Cerrar sesión</a>
+            <a href="logout.php" class="btn btn-brand ms-lg-3">Cerrar sesión</a>
         </div>
     </div>
 </nav>
